@@ -1,0 +1,20 @@
+{
+  "models": { "scout": "haiku", "implementor": "sonnet", "auditor": "haiku" },
+  "commands": { "build": null, "test": null },
+  "context_files": [],
+  "protected_paths": [],
+  "scope": { "ignore": [], "declaration_regex": null },
+  "checks": { "timeout_seconds": 900, "failure_regex": null },
+  "comments": { "max_lines": 1 },
+  "context": {
+    "update_memory": true,
+    "memory_file": ".dev-pipeline/project-memory.md",
+    "max_memory_lines": 150,
+    "refresh_command": null,
+    "refresh_tool": null,
+    "hint": null
+  },
+  "questions": "ask",
+  "require_brief_approval": true,
+  "max_fix_rounds": 2
+}

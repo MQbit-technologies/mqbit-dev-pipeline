@@ -1,0 +1,16 @@
+{
+  "name": "dev-pipeline",
+  "owner": {
+    "name": "mqbit"
+  },
+  "metadata": {
+    "description": "Requirement-first development pipeline for Claude Code: ask before coding, no invented features, model routing."
+  },
+  "plugins": [
+    {
+      "name": "dev-pipeline",
+      "source": "./",
+      "description": "Ask-first, scope-locked development pipeline with Haiku/Sonnet/Opus model routing."
+    }
+  ]
+}

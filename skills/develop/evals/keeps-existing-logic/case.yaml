@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: keeps-existing-logic
+expected_outcome: |
+  cart.py gains only the 10% discount for totals above 100. The negative-quantity check
+  and the loop are untouched, and no extra parameters, helpers or features are added.
+context:
+  scaffold_script: place-files.sh

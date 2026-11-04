@@ -1,0 +1,5 @@
+.dev-pipeline/
+dev-pipeline-workspace/
+*.skill
+.DS_Store
+Thumbs.db

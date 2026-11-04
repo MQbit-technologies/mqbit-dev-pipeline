@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "dev-pipeline configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "models": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scout": { "enum": ["haiku", "sonnet", "opus"] },
+        "implementor": { "enum": ["haiku", "sonnet", "opus"] },
+        "auditor": { "enum": ["haiku", "sonnet", "opus"] }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "build": { "type": ["string", "null"] },
+        "test": { "type": ["string", "null"] }
+      }
+    },
+    "context_files": { "type": "array", "items": { "type": "string" } },
+    "protected_paths": { "type": "array", "items": { "type": "string" } },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ignore": { "type": "array", "items": { "type": "string" } },
+        "declaration_regex": { "type": ["string", "null"] }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timeout_seconds": { "type": "integer", "minimum": 1 },
+        "failure_regex": { "type": ["string", "null"] }
+      }
+    },
+    "comments": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_lines": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "update_memory": { "type": "boolean" },
+        "memory_file": { "type": "string" },
+        "max_memory_lines": { "type": "integer", "minimum": 0 },
+        "refresh_command": { "type": ["string", "null"] },
+        "refresh_tool": { "type": ["string", "null"] },
+        "hint": { "type": ["string", "null"] }
+      }
+    },
+    "questions": { "enum": ["ask", "assume"] },
+    "require_brief_approval": { "type": "boolean" },
+    "max_fix_rounds": { "type": "integer", "minimum": 0 }
+  }
+}

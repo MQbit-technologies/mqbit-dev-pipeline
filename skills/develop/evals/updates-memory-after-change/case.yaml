@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: updates-memory-after-change
+expected_outcome: |
+  After the change is implemented and verified, the run records a short project memory
+  entry for cart.py and any durable decision, without storing code or requirement trivia,
+  and reports what the memory gained.
+context:
+  scaffold_script: place-files.sh
