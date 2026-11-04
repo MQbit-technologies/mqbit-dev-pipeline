@@ -174,14 +174,34 @@ dev-pipeline/
   cheapest place to catch a misunderstanding.
 - **Haiku reports are checkable**: every claim carries `file:line`.
 
-## Security
+## What it runs, and data handling
 
-`dev-pipeline.json` can hold shell commands (`commands.build`, `commands.test`,
-`context.refresh_command`), and the pipeline runs them. Treat that file like a build
-script: read it before running the pipeline in a repository you do not trust. The plugin
-itself runs only the commands you or your config provide, makes no network calls, and
-writes only to your project (the `.dev-pipeline/` folder, the memory file, and the files
-listed in the approved brief).
+Everything runs on your machine; the plugin has no server and makes **no network calls**.
+
+**What the plugin executes** (all readable in `skills/develop/scripts/`, standard-library
+Python only):
+
+| Script | Runs | Why |
+|--------|------|-----|
+| `scope_check.py` | read-only `git` commands (`diff`, `status`, `ls-files`, `hash-object`, `rev-parse`) | compare your changes to the approved brief |
+| `run_checks.py` | the build/test command from `dev-pipeline.json`, or one auto-detected from your project files (for example `npm test`, `dotnet test`) | run your tests and trim the output; on timeout it stops that command's own process tree (`taskkill` on Windows, a process-group kill elsewhere) |
+| `memory.py` | nothing external (optional `git ls-files`) | maintain the project memory file |
+
+It also runs `context.refresh_command` from `dev-pipeline.json`, if you set one.
+
+**What it writes** (only inside your project): `.dev-pipeline/` (brief, last test log,
+baseline), the project memory file (default `.dev-pipeline/project-memory.md`), and the
+source files listed in the brief you approve. It does not change Claude Code or permission
+settings.
+
+**Personal data:** the plugin does not collect, store or transmit personal data. The
+project memory holds short notes about your own code and decisions, stays in your
+repository or working folder, and is deleted by deleting the file. It is not sent anywhere
+by the plugin. (Claude itself processes your prompts and code as it normally does.)
+
+**Trust note:** `dev-pipeline.json` can contain shell commands (`commands.build`,
+`commands.test`, `context.refresh_command`) and the pipeline runs them. Treat it like a
+build script and read it before running the pipeline in a repository you do not trust.
 
 ## License
 
