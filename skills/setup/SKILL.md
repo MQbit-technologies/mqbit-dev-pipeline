@@ -13,7 +13,7 @@ Reference for every key: `../develop/references/configuration.md`.
 ## Steps
 
 1. **Detect.** Run
-   `python3 ../develop/scripts/run_checks.py --detect --cwd .`
+   `python3 -B ../develop/scripts/run_checks.py --detect --cwd .`
    (relative to this skill's base directory; fall back to `python`, then `py -3`).
    It prints detected stacks with guessed build/test commands and any existing config.
    If Python is unavailable, look at the project's marker files yourself

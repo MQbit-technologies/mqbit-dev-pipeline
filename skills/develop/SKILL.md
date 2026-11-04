@@ -20,20 +20,23 @@ Models shown are defaults; users can change them in `dev-pipeline.json`.
 | Implementor | Sonnet | write the change for one work unit | `dev-pipeline:implementor` |
 | Diff auditor | Haiku | mechanical scope check of the diff | `dev-pipeline:diff-auditor` |
 
-Subagents cannot spawn subagents, so you must be the one launching them. If the main
-session is not on Opus, tell the user once (`/model opus`) and continue anyway.
-Details and reasons: `references/model-routing.md`.
+Subagents cannot spawn subagents, so you must be the one launching them. The `model:`
+setting in this file is only applied when the user types the slash command; when you
+were invoked through the Skill tool you run on whatever model the session uses. Check
+which model you are. If you are not on an Opus-class model, say so in one line at the
+start ("running on <model>; `/model opus` gives stronger question-spotting") and carry
+on — the pipeline works either way. Details: `references/model-routing.md`.
 
 ## Scripts (save tokens where the answer is deterministic)
 
-Two helpers live in `scripts/` next to this file (the base directory shown when this
-skill loaded). Run them with `python3`, falling back to `python`, then `py -3`.
+Three helpers live in `scripts/` next to this file (the base directory shown when this
+skill loaded). Run them with `python3 -B`, falling back to `python -B`, then `py -3 -B`
+(`-B` keeps `__pycache__` out of the plugin folder).
 
 | Script | Replaces | Output |
 |--------|----------|--------|
 | `scope_check.py` | reading the whole diff | ~20 lines: out-of-scope files, removed lines, renames, formatting-only edits, uncovered brief items, new declarations |
 | `run_checks.py --task test` (or `build`, or `--cmd "<command>"`) | pasting raw build/test logs into context | PASS/FAIL, the failure lines, a short tail; full log saved to `.dev-pipeline/last-run.log`. The command comes from `dev-pipeline.json`, else is auto-detected (Node, Python, .NET, Java, Go, Rust, PHP, Make). |
-
 | `memory.py status\|add\|refresh\|prune` | re-exploring the codebase every run | Project memory with content fingerprints: reports which entries are FRESH, STALE or MISSING so only changed areas are re-read. See `references/project-memory.md`. |
 
 If Python or git is missing, `scope_check.py` exits 2 with a `FALLBACK` line — use the
@@ -53,6 +56,13 @@ depend on the scripts; they only cut tokens.
 
 Follow the phases in order. Do not skip a phase because the task looks easy; do keep
 each phase proportionate — a one-line change gets a short brief, not a ceremony.
+
+Some steps are cheap enough that they are never skipped, however small the change:
+the brief file, `scope_check.py --snapshot` before implementing, the implementor agent
+doing the edit, `scope_check.py` after it, tests through `run_checks.py`, and the
+Phase 8 memory update. They cost a few hundred tokens and they are what makes the
+three promises checkable. A step you truly cannot run (no Python, no git, work blocked)
+is named in the pipeline receipt with the reason — never silently dropped.
 
 ### Phase 0 — Configure (optional, fast)
 If `dev-pipeline.json` exists in the project root, read it; every key is optional and
@@ -82,6 +92,9 @@ your head as a list of concrete behaviors. If no requirement was given, ask for 
 Launch `dev-pipeline:scout` with the requirement and any hints (names, areas). Several
 scouts in parallel are fine when the requirement spans separate areas. Do not read the
 codebase yourself to find things — that is the scout's job and costs a fraction as much.
+Use a scout whenever the change could touch more than one file or the user did not name
+the file; the only time you may skip it is a change confined to one file the user named
+and you have read, which you note in the receipt.
 Read only the specific files the scout cites when you need to verify a claim that a
 decision rests on.
 
@@ -146,6 +159,11 @@ to confirm, and each new declaration must be matched to a brief item by you.
   4. Verification actually run, with results
   5. **Noticed but not done** — ideas and risks you left alone, for the user to decide
   6. Anything still open
+  7. **Pipeline receipt** — one compact line per phase run or skipped, e.g.
+     `Scout ✓ haiku · Clarify ✓ (0 questions) · Brief ✓ · Implement ✓ sonnet ·
+     Audit ✓ scope_check clean · Tests ✓ run_checks · Memory ✓ +2 entries`. A skipped
+     step shows the reason (`Scout – single named file`). This is how the user sees the
+     pipeline did its job.
 
 ### Phase 8 — Update context (only after Phase 7 passed)
 Leave the project easier to work in next time, so the next run reads less. Skip this
@@ -154,7 +172,9 @@ phase entirely if the work was blocked, rejected, or left failing, or if
 rules: `references/project-memory.md`.
 
 1. **List what changed:** `scope_check.py --files`.
-2. **Update memory** with `memory.py` (create it with `init` if missing):
+2. **Update memory** with `memory.py` (create it with `init` if missing). Every changed
+   file should end up covered by a Map entry — add a one-line entry for any that is not,
+   even after a small change. That is how the memory gets seeded:
    - `add --section map --path <p> --text "<what it is for>"` for each new area, or one
      whose purpose changed. One line each; purpose, not narrative.
    - `add --section decisions|conventions|gotchas` only for durable rules the user
@@ -180,5 +200,7 @@ Never store secrets, credentials, personal data, code, or guesses in memory.
 - *User says "just do it, no questions" or config has `questions: "assume"`:* still do Phase 2 and the brief, but resolve
   gaps by following existing code conventions, record each as an **Assumption** in the
   brief, and list the assumptions in the final message so nothing is hidden.
-- *Trivial change (a typo, one constant):* collapse the pipeline — one scout call or a
-  direct read, a two-line brief shown inline, one implementor call.
+- *Trivial change (a typo, one constant):* keep the pipeline small, not absent — read
+  the one named file directly instead of launching a scout, keep the brief to a few
+  lines, and still run snapshot → implementor → `scope_check.py` → `run_checks.py` →
+  memory update. Skip clarifying questions only if there truly are none.

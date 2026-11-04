@@ -22,10 +22,12 @@ needs judgment.
 
 - Each agent in `agents/` sets its own `model:` in frontmatter, so routing happens
   automatically whenever the orchestrator launches it.
-- The orchestrator is the main session. The skill requests Opus via `model: opus` in
-  its frontmatter; if your Claude Code version ignores that, switch manually with
-  `/model opus` (or use the `opusplan` alias, which plans on Opus and executes on
-  Sonnet).
+- The orchestrator is the main session, so it runs on whatever model your session uses.
+  The skill's `model: opus` setting is **not** applied when Claude invokes the skill
+  itself (observed in testing: the orchestrator stayed on Sonnet). Start your session on
+  Opus with `/model opus`, or use the `opusplan` alias, which plans on Opus and executes
+  on Sonnet. The pipeline still works on Sonnet; Opus is better at spotting ambiguity.
+  The skill tells the user at the start if it is not on an Opus-class model.
 - **Subagents cannot launch subagents.** That is why the orchestrator is the main
   session and not itself a subagent.
 

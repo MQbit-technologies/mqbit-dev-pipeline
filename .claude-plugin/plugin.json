@@ -1,6 +1,6 @@
 {
   "name": "dev-pipeline",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Requirement-first development pipeline: asks clarifying questions before coding, never invents features or removes existing logic, and routes work by model (Haiku scouts, Sonnet implements, Opus orchestrates).",
   "author": {
     "name": "Mukesh"

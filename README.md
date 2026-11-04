@@ -125,8 +125,10 @@ For deeper customization everything else is plain Markdown:
 | What counts as scope creep | `skills/develop/references/scope-guardrails.md` |
 | Brief layout | `skills/develop/assets/brief-template.md` |
 
-For the main-session model, run `/model opus` (or `opusplan`) if your version does not
-pick up the skill's `model: opus` setting.
+**Orchestrator model:** the pipeline's orchestrator is your main session, and the skill's
+`model: opus` is not applied when Claude invokes the skill itself. For the best question-
+spotting, start the session with `/model opus` (or `opusplan`). It works on Sonnet too,
+and tells you which model it is on.
 
 ## Layout
 
@@ -156,8 +158,8 @@ dev-pipeline/
 │   │   ├── run_checks.py      # test/build runner that trims output
 │   │   ├── memory.py          # project memory with staleness fingerprints
 │   │   └── devconfig.py       # shared dev-pipeline.json loader
-│   └── evals/                 # test cases for the skill
 ├── skills/setup/SKILL.md      # /dev-pipeline:setup — writes dev-pipeline.json
+├── evals/                     # test cases: claude plugin eval .
 ├── CHANGELOG.md
 ├── LICENSE
 └── README.md
