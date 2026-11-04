@@ -1,12 +1,12 @@
 {
-  "name": "dev-pipeline",
-  "version": "0.1.2",
+  "name": "mqbit-dev-pipeline",
+  "version": "0.2.0",
   "description": "Requirement-first development pipeline: asks clarifying questions before coding, never invents features or removes existing logic, and routes work by model (Haiku scouts, Sonnet implements, Opus orchestrates).",
   "author": {
-    "name": "Mukesh"
+    "name": "Mqbit Technologies"
   },
-  "homepage": "https://github.com/mqbitplatform-ctrl/dev-pipeline",
-  "repository": "https://github.com/mqbitplatform-ctrl/dev-pipeline",
+  "homepage": "https://github.com/mqbitplatform-ctrl/mqbit-dev-pipeline",
+  "repository": "https://github.com/mqbitplatform-ctrl/mqbit-dev-pipeline",
   "license": "MIT",
   "keywords": [
     "workflow",

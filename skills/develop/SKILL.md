@@ -16,9 +16,9 @@ Models shown are defaults; users can change them in `dev-pipeline.json`.
 | Role | Model | Does | Agent |
 |------|-------|------|-------|
 | Orchestrator (you) | Opus | clarify, brief, decide, verify | main session |
-| Scout | Haiku | read files, search, report facts | `dev-pipeline:scout` |
-| Implementor | Sonnet | write the change for one work unit | `dev-pipeline:implementor` |
-| Diff auditor | Haiku | mechanical scope check of the diff | `dev-pipeline:diff-auditor` |
+| Scout | Haiku | read files, search, report facts | `mqbit-dev-pipeline:scout` |
+| Implementor | Sonnet | write the change for one work unit | `mqbit-dev-pipeline:implementor` |
+| Diff auditor | Haiku | mechanical scope check of the diff | `mqbit-dev-pipeline:diff-auditor` |
 
 Subagents cannot spawn subagents, so you must be the one launching them. The `model:`
 setting in this file is only applied when the user types the slash command; when you
@@ -67,7 +67,7 @@ is named in the pipeline receipt with the reason — never silently dropped.
 ### Phase 0 — Configure (optional, fast)
 If `dev-pipeline.json` exists in the project root, read it; every key is optional and
 defaults apply to anything missing (full reference: `references/configuration.md`).
-No file is fine — just work with defaults and mention once that `/dev-pipeline:setup`
+No file is fine — just work with defaults and mention once that `/mqbit-dev-pipeline:setup`
 can create one. Apply it like this:
 
 - `models` → pass as the `model` argument when launching each agent (overrides the
@@ -89,7 +89,7 @@ Read the requirement in `$ARGUMENTS` (if it is a path, read the file). Restate i
 your head as a list of concrete behaviors. If no requirement was given, ask for one.
 
 ### Phase 2 — Scout (Haiku)
-Launch `dev-pipeline:scout` with the requirement and any hints (names, areas). Several
+Launch `mqbit-dev-pipeline:scout` with the requirement and any hints (names, areas). Several
 scouts in parallel are fine when the requirement spans separate areas. Do not read the
 codebase yourself to find things — that is the scout's job and costs a fraction as much.
 Use a scout whenever the change could touch more than one file or the user did not name
@@ -130,7 +130,7 @@ blamed on it.
 
 ### Phase 5 — Implement (Sonnet)
 Split the brief into work units that touch disjoint files. Launch one
-`dev-pipeline:implementor` per unit — in parallel when files do not overlap, otherwise
+`mqbit-dev-pipeline:implementor` per unit — in parallel when files do not overlap, otherwise
 in sequence. Each prompt contains: the brief path, the unit's number and file list, the
 build/test command, the comment limit (`comments.max_lines`, default 1 line), and the
 full path of `scripts/run_checks.py` so the implementor runs tests through it instead of
@@ -142,7 +142,7 @@ dumping raw logs. The implementor edits only listed files and returns a status:
 ### Phase 6 — Audit (script first, Haiku as fallback)
 Run `scope_check.py`. It reports files outside scope, removed/replaced lines, renames,
 formatting-only edits, uncovered brief items and new declarations. Only if it exits 2
-(no git / no Python) launch `dev-pipeline:diff-auditor` to do the same by reading.
+(no git / no Python) launch `mqbit-dev-pipeline:diff-auditor` to do the same by reading.
 The script cannot judge intent: a removal inside an authorised file is listed for you
 to confirm, and each new declaration must be matched to a brief item by you.
 

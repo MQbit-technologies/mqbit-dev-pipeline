@@ -1,14 +1,14 @@
 {
-  "name": "dev-pipeline",
+  "name": "mqbit-dev-pipeline",
   "owner": {
-    "name": "mqbit"
+    "name": "Mqbit Technologies"
   },
   "metadata": {
     "description": "Requirement-first development pipeline for Claude Code: ask before coding, no invented features, model routing."
   },
   "plugins": [
     {
-      "name": "dev-pipeline",
+      "name": "mqbit-dev-pipeline",
       "source": "./",
       "description": "Ask-first, scope-locked development pipeline with Haiku/Sonnet/Opus model routing."
     }

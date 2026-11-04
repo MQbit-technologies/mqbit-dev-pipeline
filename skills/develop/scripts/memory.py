@@ -31,7 +31,7 @@ SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "bu
 MAX_FILES = 3000
 ENTRY_RE = re.compile(r"^- `([^`]+)`\s*(?:[-—–]\s*)?(.*?)\s*(?:<!--fp:([0-9a-f]+)-->)?\s*$")
 TEMPLATE = """# Project memory
-> Kept up to date by dev-pipeline. Facts only, one line each. Delete anything wrong.
+> Kept up to date by Mqbit Dev Pipeline. Facts only, one line each. Delete anything wrong.
 
 ## Map
 <!-- - `path` - what it is for -->

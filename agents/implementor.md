@@ -1,6 +1,6 @@
 ---
 name: implementor
-description: Implements one scoped work unit from an approved brief in the dev-pipeline. Makes the smallest change that satisfies the brief, touches only the files the brief lists, and stops with a question instead of guessing. Use only after the orchestrator has written and the user has approved the brief.
+description: Implements one scoped work unit from an approved brief in the Mqbit Dev Pipeline. Makes the smallest change that satisfies the brief, touches only the files the brief lists, and stops with a question instead of guessing. Use only after the orchestrator has written and the user has approved the brief.
 model: sonnet
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---

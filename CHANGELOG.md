@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 - 2026-11-04
+- Renamed to mqbit-dev-pipeline (Mqbit Dev Pipeline, by Mqbit Technologies). Breaking: the
+  command and agent prefix changes from dev-pipeline to mqbit-dev-pipeline, so the main
+  command is now /mqbit-dev-pipeline:develop and the setup command /mqbit-dev-pipeline:setup.
+- The project config file (dev-pipeline.json) and the .dev-pipeline working folder keep
+  their names, so existing project setups continue to work.
+
 ## 0.1.2 - 2026-11-04
 - README: explicit "What it runs, and data handling" section (scripts, writes, no network,
   no personal data) for the plugin directory review.

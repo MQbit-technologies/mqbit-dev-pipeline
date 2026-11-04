@@ -1,6 +1,6 @@
 ---
 name: setup
-description: One-time project setup for the dev-pipeline plugin. Detects the project's stack and build/test commands, asks a few short questions, and writes dev-pipeline.json in the project root. Use when the user says "set up dev-pipeline", "configure the pipeline", "change which model does what", "set my test command", or when /dev-pipeline:develop reports no config and the user wants one.
+description: One-time project setup for the dev-pipeline plugin. Detects the project's stack and build/test commands, asks a few short questions, and writes dev-pipeline.json in the project root. Use when the user says "set up dev-pipeline", "configure the pipeline", "change which model does what", "set my test command", or when /mqbit-dev-pipeline:develop reports no config and the user wants one.
 argument-hint: (no arguments)
 ---
 
@@ -41,7 +41,7 @@ Reference for every key: `../develop/references/configuration.md`.
    Ask whether to add `.dev-pipeline/` to `.gitignore`, and do it on yes. Do not touch
    `.gitignore` without that answer.
 6. **Confirm** in two or three lines: what was written and how to run the pipeline
-   (`/dev-pipeline:develop <requirement>`).
+   (`/mqbit-dev-pipeline:develop <requirement>`).
 
 ## Rules
 

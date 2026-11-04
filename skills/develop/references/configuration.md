@@ -2,7 +2,7 @@
 
 Optional file in the project root. Commit it so the whole team gets the same behavior.
 Every key is optional; anything missing uses the default. Unknown keys are ignored with a
-warning (usually a typo). Run `/dev-pipeline:setup` to create one interactively.
+warning (usually a typo). Run `/mqbit-dev-pipeline:setup` to create one interactively.
 
 ```json
 {

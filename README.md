@@ -1,4 +1,6 @@
-# dev-pipeline
+# Mqbit Dev Pipeline
+
+*A Claude Code plugin by Mqbit Technologies.*
 
 A Claude Code plugin that makes AI-assisted development **ask first, build exactly what
 was asked, and keep costs sensible** by routing each kind of work to the right model.
@@ -66,20 +68,20 @@ output. The result is the same, just with more tokens spent.
 From a marketplace (after you publish this repo to GitHub):
 
 ```
-/plugin marketplace add mqbitplatform-ctrl/dev-pipeline
-/plugin install dev-pipeline@dev-pipeline
+/plugin marketplace add mqbitplatform-ctrl/mqbit-dev-pipeline
+/plugin install mqbit-dev-pipeline@mqbit-dev-pipeline
 ```
 
 Try it locally without installing:
 
 ```
-claude --plugin-dir ./dev-pipeline
+claude --plugin-dir ./mqbit-dev-pipeline
 ```
 
 ## Use
 
 ```
-/dev-pipeline:develop Add a 10% discount for orders above 100 EUR, see docs/story-42.md
+/mqbit-dev-pipeline:develop Add a 10% discount for orders above 100 EUR, see docs/story-42.md
 ```
 
 It also triggers on its own when you ask Claude to implement, build, add, change or fix
@@ -94,7 +96,7 @@ Python 3 are optional and only save tokens. The assistant answers in your langua
 
 ## Configuration
 
-Zero config works. To tune it, run `/dev-pipeline:setup` (detects your stack, asks a few
+Zero config works. To tune it, run `/mqbit-dev-pipeline:setup` (detects your stack, asks a few
 short questions) or create `dev-pipeline.json` in your project root by hand and commit it.
 Every key is optional:
 
@@ -133,7 +135,7 @@ and tells you which model it is on.
 ## Layout
 
 ```
-dev-pipeline/
+mqbit-dev-pipeline/
 ├── .claude-plugin/
 │   ├── plugin.json            # plugin manifest
 │   └── marketplace.json       # lets this repo act as its own marketplace
@@ -158,7 +160,7 @@ dev-pipeline/
 │   │   ├── run_checks.py      # test/build runner that trims output
 │   │   ├── memory.py          # project memory with staleness fingerprints
 │   │   └── devconfig.py       # shared dev-pipeline.json loader
-├── skills/setup/SKILL.md      # /dev-pipeline:setup — writes dev-pipeline.json
+├── skills/setup/SKILL.md      # /mqbit-dev-pipeline:setup — writes dev-pipeline.json
 ├── evals/                     # test cases: claude plugin eval .
 ├── CHANGELOG.md
 ├── LICENSE

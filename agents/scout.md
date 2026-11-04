@@ -1,6 +1,6 @@
 ---
 name: scout
-description: Read-only code scout for the dev-pipeline. Finds and reads the files relevant to a requirement and reports facts (what exists, where, how it behaves, which conventions apply). Use for any file reading or code search that precedes a design or implementation decision. Never edits, never proposes designs.
+description: Read-only code scout for the Mqbit Dev Pipeline. Finds and reads the files relevant to a requirement and reports facts (what exists, where, how it behaves, which conventions apply). Use for any file reading or code search that precedes a design or implementation decision. Never edits, never proposes designs.
 model: haiku
 tools: Read, Grep, Glob
 ---

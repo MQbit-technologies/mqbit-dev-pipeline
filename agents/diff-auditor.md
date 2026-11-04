@@ -1,6 +1,6 @@
 ---
 name: diff-auditor
-description: Fallback scope audit for the dev-pipeline, used only when scripts/scope_check.py cannot run (no git or no Python). Compares what changed on disk against the approved brief and flags files outside scope, removed or replaced lines, renames, and unrequested additions. Read-only; reports facts, does not fix.
+description: Fallback scope audit for the Mqbit Dev Pipeline, used only when scripts/scope_check.py cannot run (no git or no Python). Compares what changed on disk against the approved brief and flags files outside scope, removed or replaced lines, renames, and unrequested additions. Read-only; reports facts, does not fix.
 model: haiku
 tools: Read, Grep, Glob, Bash
 ---
