@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 - 2026-11-08
+- Repository moved to github.com/MQbit-technologies/mqbit-dev-pipeline: homepage,
+  repository and the install command now point there.
+
 ## 0.3.0 - 2026-11-08
 - The plugin now contains only Markdown, JSON and the icon. The Python helper scripts
   and the evals folder are no longer shipped, to meet the plugin directory's file-type

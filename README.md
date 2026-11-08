@@ -65,7 +65,7 @@ changed, and memory entries are re-checked when a requirement touches them.
 From a marketplace (after you publish this repo to GitHub):
 
 ```
-/plugin marketplace add mqbitplatform-ctrl/mqbit-dev-pipeline
+/plugin marketplace add MQbit-technologies/mqbit-dev-pipeline
 /plugin install mqbit-dev-pipeline@mqbit-dev-pipeline
 ```
 
