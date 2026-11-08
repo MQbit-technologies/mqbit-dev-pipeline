@@ -84,8 +84,17 @@ claude --plugin-dir ./mqbit-dev-pipeline
 /mqbit-dev-pipeline:develop Add a 10% discount for orders above 100 EUR, see docs/story-42.md
 ```
 
-It also triggers on its own when you ask Claude to implement, build, add, change or fix
-something from a requirement.
+Claude can also start it when you ask to use the dev pipeline, or hand over a ticket,
+story or spec file to implement end to end. It does not take over ordinary questions,
+reviews or quick edits.
+
+Example prompts:
+
+```
+/mqbit-dev-pipeline:develop docs/story-42.md
+Use the dev pipeline to implement JIRA-118: customers can export invoices as CSV
+/mqbit-dev-pipeline:setup
+```
 
 ## Works with any stack
 

@@ -1,6 +1,6 @@
 ---
 name: develop
-description: Requirement-first development pipeline. Use this before writing or changing code for any feature, bug fix, change request, or user story — whenever the user says "implement", "build", "add", "change", "fix", "develop this story/ticket/requirement", or pastes a requirement or spec. It reads the code first, asks the user precise questions about anything ambiguous, writes a scope-locked brief, then delegates by model (Haiku reads, Sonnet implements, Opus orchestrates and decides). It never invents features and never removes existing logic. Use it even when the request looks small, because the cost of a wrong guess is a rewrite.
+description: Requirement-first development pipeline for building a feature, bug fix or user story from a written requirement. Use when the user runs /mqbit-dev-pipeline:develop, asks to use the dev pipeline, or hands over a ticket, story or spec file to be implemented end to end. It reads the code, asks clarifying questions about anything ambiguous, writes a scope-locked brief for the user to approve, then delegates reading to a Haiku scout and editing to a Sonnet implementor. Not for questions, explanations, reviews, or quick edits the user asks for directly.
 model: opus
 argument-hint: <requirement text, ticket, or path to a spec file>
 ---
@@ -184,8 +184,9 @@ rules: `references/project-memory.md`.
    - `prune` to drop entries whose path no longer exists.
    - If `status` reports OVER CAP, compress the file (merge or drop low-value lines).
 3. **Refresh the code index, if configured.** `context.refresh_command`: run it in the
-   background (`run_in_background`) and do not wait. `context.refresh_tool`: call that
-   tool (load its schema first if it is deferred). A slow or failed refresh must never
+   background (`run_in_background`) and do not wait. `context.refresh_tool`: call exactly the
+   tool the user named there and no other (load its schema first if it is deferred).
+   If neither key is set, do not call any index or external tool. A slow or failed refresh must never
    hold up the final message — note it in one line and continue.
 4. Add one line to the final message: what the memory gained, and whether the index
    refresh started, was skipped, or failed.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 - 2026-11-08
+- The develop skill's description now covers only its own job: running the pipeline on a
+  written requirement, ticket or spec. It no longer claims every coding request, so it
+  does not take over ordinary questions, reviews or quick edits.
+- The index refresh step calls only the tool the user configured, and calls none if
+  nothing is configured.
+- README: example prompts and a description of when the skill starts.
+
 ## 0.2.0 - 2026-11-04
 - Renamed to mqbit-dev-pipeline (Mqbit Dev Pipeline, by Mqbit Technologies). Breaking: the
   command and agent prefix changes from dev-pipeline to mqbit-dev-pipeline, so the main
