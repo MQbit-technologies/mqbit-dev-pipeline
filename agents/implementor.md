@@ -43,11 +43,9 @@ work unit you were given — nothing more.
    brief points to.
 3. Make the change. Use Edit for existing files.
 4. If the brief lists tests to add or update, do exactly those. Run the specified
-   build/test command and report the real output — including failures. If the
-   orchestrator gave you a `run_checks.py` path, run it as
-   `python3 -B <path> --cmd "<command>"` (or `python -B`); it shows only the failures, and the
-   full log is in `.dev-pipeline/last-run.log` if you need more. If it is not
-   available, run the command directly and trim long output yourself.
+   build/test command and report the real output — including failures. Send the
+   output to `.dev-pipeline/last-run.log` (`<command> > .dev-pipeline/last-run.log 2>&1`),
+   then read back only the exit code, the failure lines and the last ~20 lines.
 5. Re-read your diff once, asking: is every changed line required by the brief, and is
    every comment you added a single short line?
 

@@ -31,14 +31,14 @@ warning (usually a typo). Run `/mqbit-dev-pipeline:setup` to create one interact
 | Key | Default | Meaning |
 |-----|---------|---------|
 | `models.scout` / `implementor` / `auditor` | `haiku` / `sonnet` / `haiku` | Model alias per agent: `haiku`, `sonnet`, `opus`. The orchestrator is your main session; set it with `/model`. |
-| `commands.build` / `commands.test` | auto-detected | Shell commands run by `run_checks.py --task build\|test`. Detection covers Node (npm/pnpm/yarn/bun), Python, .NET, Maven, Gradle, Go, Rust, PHP, Make. |
+| `commands.build` / `commands.test` | auto-detected | Shell commands the pipeline runs for build and test. Detection covers Node (npm/pnpm/yarn/bun), Python, .NET, Maven, Gradle, Go, Rust, PHP, Make. |
 | `context_files` | `[]` | Files every scout reads first: contributing guides, architecture notes, house rules. |
-| `protected_paths` | `[]` | Globs the pipeline must not edit without the user's explicit approval (migrations, generated code, vendored code). `scope_check` flags any touch. |
-| `scope.ignore` | `[]` | Globs `scope_check` skips entirely (lockfiles, build output, generated files). |
-| `scope.declaration_regex` | built-in multi-language pattern | Regex for lines that declare new public things (functions, classes, ...); matches are listed for review. Set it for languages the default misses. |
-| `checks.timeout_seconds` | `900` | Kill the build/test command after this long. |
-| `checks.failure_regex` | built-in | Regex that marks a line as a failure line when trimming output. |
-| `comments.max_lines` | `1` | Longest comment (in lines) the implementor may add; `scope_check` flags longer added runs. `0` turns the limit off. Existing comments are never touched. |
+| `protected_paths` | `[]` | Globs the pipeline must not edit without the user's explicit approval (migrations, generated code, vendored code). The diff auditor flags any touch. |
+| `scope.ignore` | `[]` | Globs the diff auditor skips entirely (lockfiles, build output, generated files). |
+| `scope.declaration_regex` | built-in multi-language pattern | Regex for lines that declare new public things (functions, classes, ...); the diff auditor lists matches for review. Set it for languages the default misses. |
+| `checks.timeout_seconds` | `900` | Stop the build/test command after this long. |
+| `checks.failure_regex` | `fail\|error\|exception` | Regex used to pick the failure lines out of the test log. |
+| `comments.max_lines` | `1` | Longest comment (in lines) the implementor may add; the diff auditor flags longer added runs. `0` turns the limit off. Existing comments are never touched. |
 | `context.update_memory` | `true` | After a verified change, update the project memory (see `project-memory.md`). `false` turns Phase 8 off. |
 | `context.memory_file` | `.dev-pipeline/project-memory.md` | Where memory lives. Point it at a tracked path (e.g. `docs/PROJECT_MEMORY.md`) to share it with the team. |
 | `context.max_memory_lines` | `150` | Soft cap; `status` warns above it and the pipeline compresses the file. |

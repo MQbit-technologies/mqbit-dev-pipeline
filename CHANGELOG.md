@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 - 2026-11-08
+- The plugin now contains only Markdown, JSON and the icon. The Python helper scripts
+  and the evals folder are no longer shipped, to meet the plugin directory's file-type
+  rule for organizations that are not Verified.
+- The diff-auditor agent is now the standard audit step (it was a fallback), and it also
+  checks comment length and protected paths.
+- Tests run directly, with output saved to .dev-pipeline/last-run.log; only the failure
+  lines and a short tail are read back.
+- Project memory map entries are stamped with a commit instead of a file fingerprint, and
+  git shows which entries are stale. Older fingerprint stamps count as stale and are
+  replaced on the next update.
+- The brief template has a Baseline section (starting commit and already-modified files).
+
 ## 0.2.1 - 2026-11-08
 - The develop skill's description now covers only its own job: running the pipeline on a
   written requirement, ticket or spec. It no longer claims every coding request, so it

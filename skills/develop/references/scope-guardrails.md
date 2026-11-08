@@ -45,7 +45,7 @@ Existing code is evidence of a requirement you may not be able to see. Therefore
 New comments are one short line (`comments.max_lines` in the config, default 1) and only
 where the *why* is not obvious from the code. Long comment blocks, banners, essay
 docstrings and "what this does" narration add review noise and drift out of date. Existing
-comments are left alone. `scope_check.py` flags any added comment run longer than the
+comments are left alone. The diff auditor flags any added comment run longer than the
 limit; shorten it rather than deleting the useful part.
 
 ## 4. Judging the audit (Phase 7)

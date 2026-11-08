@@ -12,12 +12,11 @@ Reference for every key: `../develop/references/configuration.md`.
 
 ## Steps
 
-1. **Detect.** Run
-   `python3 -B ../develop/scripts/run_checks.py --detect --cwd .`
-   (relative to this skill's base directory; fall back to `python`, then `py -3`).
-   It prints detected stacks with guessed build/test commands and any existing config.
-   If Python is unavailable, look at the project's marker files yourself
-   (`package.json`, `pyproject.toml`, `*.sln`, `pom.xml`, `go.mod`, `Cargo.toml`, `Makefile`).
+1. **Detect.** Look at the project's marker files (`package.json`, `pyproject.toml`,
+   `pytest.ini`, `*.sln`, `*.csproj`, `pom.xml`, `build.gradle*`, `go.mod`, `Cargo.toml`,
+   `composer.json`, `Makefile`) and guess the build/test commands from them. For
+   `package.json`, use its `scripts` entries and the lockfile present (`pnpm-lock.yaml`,
+   `yarn.lock`, `bun.lockb`, else npm).
 2. **If `dev-pipeline.json` already exists**, read it and treat this run as an edit: show
    the current values and change only what the user asks to change.
 3. **Ask** with `AskUserQuestion` (plain numbered text if the tool is unavailable), in at

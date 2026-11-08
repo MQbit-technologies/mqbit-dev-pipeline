@@ -3,3 +3,7 @@ dev-pipeline-workspace/
 *.skill
 .DS_Store
 Thumbs.db
+
+# Kept locally, not shipped in the plugin
+evals/
+skills/develop/scripts/

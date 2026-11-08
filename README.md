@@ -25,7 +25,7 @@ was asked, and keep costs sensible** by routing each kind of work to the right m
      ▼
  1 Intake ──► 2 Scout (Haiku) ──► 3 Clarify (Opus ⇄ you) ──► 4 Brief (you approve)
                                                                    │
-        7 Verify & close (Opus) ◄── 6 Audit (script) ◄── 5 Implement (Sonnet)
+        7 Verify & close (Opus) ◄── 6 Audit (Haiku) ◄── 5 Implement (Sonnet)
                 │
                 ▼
         8 Update context: project memory + code-index refresh
@@ -42,26 +42,23 @@ The shared source of truth is `.dev-pipeline/brief.md`, created in your project 
 run. It records your answers, what is in/out of scope, and which existing logic is
 protected. Add `.dev-pipeline/` to your `.gitignore` if you don't want to commit it.
 
-## Scripts (optional)
+## Keeping token use low
 
-Python 3 (standard library only) and git make the pipeline cheaper; neither is required.
+The plugin is Markdown and JSON only; it ships no scripts.
 
-- `scope_check.py` compares your working tree to the brief and prints files outside
-  scope, removed/replaced lines, renames, formatting-only edits, uncovered brief items
-  and new declarations. Exit 0 clean, 1 findings, 2 cannot run.
-- `run_checks.py --task test` runs your configured (or auto-detected) test command and
-  prints PASS/FAIL, the failure lines and a short tail; the full log goes to
-  `.dev-pipeline/last-run.log`. `--cmd "<command>"` runs any command you give it.
-
-- `memory.py` maintains the project memory. Each map entry stores a fingerprint of the
-  code it describes, so `status` shows exactly which entries are stale and scouts re-read
-  only those. See [`project-memory.md`](skills/develop/references/project-memory.md).
+- The `diff-auditor` (Haiku) checks the change against the brief from `git diff`, so the
+  orchestrator never reads whole files to audit them.
+- Test and build output goes to `.dev-pipeline/last-run.log`; only the exit code, the
+  failure lines and a short tail are read back.
+- The project memory stamps each map entry with the commit it was verified at, so one
+  `git diff --name-only` shows which entries are stale and scouts re-read only those. See
+  [`project-memory.md`](skills/develop/references/project-memory.md).
 
 To keep a code graph or search index current too, set `context.refresh_command` (runs in
 the background) or `context.refresh_tool` (an MCP tool) in `dev-pipeline.json`.
 
-Without Python or git, the pipeline falls back to the `diff-auditor` agent and raw test
-output. The result is the same, just with more tokens spent.
+Git is optional. Without it, the auditor reads the files the implementor reports as
+changed, and memory entries are re-checked when a requirement touches them.
 
 ## Install
 
@@ -100,8 +97,8 @@ Use the dev pipeline to implement JIRA-118: customers can export invoices as CSV
 
 Nothing in the plugin assumes a language, framework or OS. Build/test commands are
 auto-detected for Node (npm/pnpm/yarn/bun), Python, .NET, Maven, Gradle, Go, Rust, PHP
-and Make, and you can set your own. It needs Claude Code (subagents + skills); git and
-Python 3 are optional and only save tokens. The assistant answers in your language.
+and Make, and you can set your own. It needs Claude Code (subagents + skills); git is
+optional and only saves tokens. The assistant answers in your language.
 
 ## Configuration
 
@@ -151,7 +148,7 @@ mqbit-dev-pipeline/
 ├── agents/
 │   ├── scout.md               # Haiku, read-only
 │   ├── implementor.md         # Sonnet, edits only the files in the brief
-│   └── diff-auditor.md        # Haiku, fallback when scope_check.py can't run
+│   └── diff-auditor.md        # Haiku, read-only, checks the diff against the brief
 ├── skills/develop/
 │   ├── SKILL.md               # the orchestrator (pipeline + rules)
 │   ├── references/            # loaded on demand
@@ -164,13 +161,7 @@ mqbit-dev-pipeline/
 │   │   ├── brief-template.md
 │   │   ├── dev-pipeline.example.json
 │   │   └── dev-pipeline.schema.json
-│   ├── scripts/               # optional token savers (Python 3, stdlib only)
-│   │   ├── scope_check.py     # diff vs brief → ~20-line report
-│   │   ├── run_checks.py      # test/build runner that trims output
-│   │   ├── memory.py          # project memory with staleness fingerprints
-│   │   └── devconfig.py       # shared dev-pipeline.json loader
 ├── skills/setup/SKILL.md      # /mqbit-dev-pipeline:setup — writes dev-pipeline.json
-├── evals/                     # test cases: claude plugin eval .
 ├── CHANGELOG.md
 ├── LICENSE
 └── README.md
@@ -189,16 +180,14 @@ mqbit-dev-pipeline/
 
 Everything runs on your machine; the plugin has no server and makes **no network calls**.
 
-**What the plugin executes** (all readable in `skills/develop/scripts/`, standard-library
-Python only):
+**What the plugin runs:** the plugin contains no scripts or executables. Through Claude
+Code's normal tools, with your usual permission prompts, the pipeline runs:
 
-| Script | Runs | Why |
-|--------|------|-----|
-| `scope_check.py` | read-only `git` commands (`diff`, `status`, `ls-files`, `hash-object`, `rev-parse`) | compare your changes to the approved brief |
-| `run_checks.py` | the build/test command from `dev-pipeline.json`, or one auto-detected from your project files (for example `npm test`, `dotnet test`) | run your tests and trim the output; on timeout it stops that command's own process tree (`taskkill` on Windows, a process-group kill elsewhere) |
-| `memory.py` | nothing external (optional `git ls-files`) | maintain the project memory file |
-
-It also runs `context.refresh_command` from `dev-pipeline.json`, if you set one.
+| Command | Why |
+|---------|-----|
+| read-only `git` commands (`rev-parse`, `status`, `diff`) | record a baseline and compare your changes to the approved brief |
+| the build/test command from `dev-pipeline.json`, or one detected from your project files (for example `npm test`, `dotnet test`) | run your tests; output goes to `.dev-pipeline/last-run.log` |
+| `context.refresh_command` from `dev-pipeline.json`, only if you set one | refresh your code index |
 
 **What it writes** (only inside your project): `.dev-pipeline/` (brief, last test log,
 baseline), the project memory file (default `.dev-pipeline/project-memory.md`), and the

@@ -11,12 +11,11 @@ where volume matters.
 | Writing the change for a well-specified work unit | **Sonnet** (`implementor`) | Strong coding at a moderate cost; the brief removes the ambiguity so deep reasoning is not needed. |
 | Spotting ambiguity, asking the user, fencing scope, judging the audit, final verification | **Opus** (main session) | Where a wrong call is expensive: a missed question or an accepted scope violation costs a rewrite. |
 
-## Scripts instead of models
+## Cheap model for the mechanical checks
 
-Anything deterministic is done by a script, which costs no tokens: the diff-versus-brief
-check (`scripts/scope_check.py`) and test-output trimming (`scripts/run_checks.py`).
-That is why the Haiku `diff-auditor` is only a fallback. Models stay on the work that
-needs judgment.
+The diff-versus-brief check is mechanical, so the Haiku `diff-auditor` does it from
+`git diff`, and test output goes to a log file with only the failure lines and a short
+tail read back. The expensive model stays on the work that needs judgment.
 
 ## How it is wired
 

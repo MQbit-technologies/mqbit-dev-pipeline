@@ -27,21 +27,24 @@ which model you are. If you are not on an Opus-class model, say so in one line a
 start ("running on <model>; `/model opus` gives stronger question-spotting") and carry
 on — the pipeline works either way. Details: `references/model-routing.md`.
 
-## Scripts (save tokens where the answer is deterministic)
+## Keeping tool output small
 
-Three helpers live in `scripts/` next to this file (the base directory shown when this
-skill loaded). Run them with `python3 -B`, falling back to `python -B`, then `py -3 -B`
-(`-B` keeps `__pycache__` out of the plugin folder).
+The plugin ships no scripts. Three habits keep token use low:
 
-| Script | Replaces | Output |
-|--------|----------|--------|
-| `scope_check.py` | reading the whole diff | ~20 lines: out-of-scope files, removed lines, renames, formatting-only edits, uncovered brief items, new declarations |
-| `run_checks.py --task test` (or `build`, or `--cmd "<command>"`) | pasting raw build/test logs into context | PASS/FAIL, the failure lines, a short tail; full log saved to `.dev-pipeline/last-run.log`. The command comes from `dev-pipeline.json`, else is auto-detected (Node, Python, .NET, Java, Go, Rust, PHP, Make). |
-| `memory.py status\|add\|refresh\|prune` | re-exploring the codebase every run | Project memory with content fingerprints: reports which entries are FRESH, STALE or MISSING so only changed areas are re-read. See `references/project-memory.md`. |
-
-If Python or git is missing, `scope_check.py` exits 2 with a `FALLBACK` line — use the
-`diff-auditor` agent instead, and run the test command directly. Quality does not
-depend on the scripts; they only cut tokens.
+- **Baseline (snapshot).** Before implementing, record `git rev-parse HEAD` and
+  `git status --porcelain` in the brief's Baseline section, so edits that existed before
+  the pipeline are not blamed on it. Not a git repository: write "no git" there.
+- **Tests and builds.** Run the command with its output sent to
+  `.dev-pipeline/last-run.log` (for example `<command> > .dev-pipeline/last-run.log 2>&1`),
+  then report the exit code, the failure lines (grep the log for `fail|error|exception`)
+  and the last ~20 lines. Never paste a whole log into context. The command comes from
+  `dev-pipeline.json`, or from the project's marker files (`package.json` → `npm test`,
+  `pyproject.toml`/`pytest.ini` → `pytest`, `*.sln`/`*.csproj` → `dotnet test`,
+  `pom.xml` → `mvn test`, `build.gradle*` → `gradle test`, `go.mod` → `go test ./...`,
+  `Cargo.toml` → `cargo test`, `composer.json` → `composer test`, `Makefile` → `make test`).
+  If nothing fits, ask the user. Never invent a command.
+- **Audit.** The `diff-auditor` agent (Haiku) reads `git diff` against the baseline,
+  not whole files.
 
 ## Three promises to the user
 
@@ -58,10 +61,10 @@ Follow the phases in order. Do not skip a phase because the task looks easy; do 
 each phase proportionate — a one-line change gets a short brief, not a ceremony.
 
 Some steps are cheap enough that they are never skipped, however small the change:
-the brief file, `scope_check.py --snapshot` before implementing, the implementor agent
-doing the edit, `scope_check.py` after it, tests through `run_checks.py`, and the
-Phase 8 memory update. They cost a few hundred tokens and they are what makes the
-three promises checkable. A step you truly cannot run (no Python, no git, work blocked)
+the brief file, the baseline before implementing, the implementor agent doing the edit,
+the diff audit after it, the test run, and the Phase 8 memory update. They cost a few
+hundred tokens and they are what makes the three promises checkable. A step you truly
+cannot run (no git, no test command, work blocked)
 is named in the pipeline receipt with the reason — never silently dropped.
 
 ### Phase 0 — Configure (optional, fast)
@@ -80,7 +83,8 @@ can create one. Apply it like this:
 - `max_fix_rounds` → limit for Phase 7 (default 2).
 - `comments.max_lines` → longest comment the implementor may add (default 1; 0 = no limit).
 - `context.*` → project memory and optional code-index refresh (Phases 2, 3 and 8). If
-  `context.update_memory` is true and the memory file exists, run `memory.py status` now.
+  `context.update_memory` is true and the memory file exists, check which entries are
+  stale now (method in `references/project-memory.md`).
 
 Talk to the user in the language they write in; keep code, paths and commands verbatim.
 
@@ -98,7 +102,8 @@ and you have read, which you note in the receipt.
 Read only the specific files the scout cites when you need to verify a claim that a
 decision rests on.
 
-When project memory exists, give each scout its path and the `memory.py status` output:
+When project memory exists, give each scout its path and the list of FRESH, STALE and
+MISSING entries:
 trust FRESH entries instead of re-reading those areas, and verify STALE or MISSING ones
 against the code. Memory is a head start, not an authority — the code wins on any
 conflict. Also pass along `context_files` and `context.hint` (for example "prefer the
@@ -125,33 +130,34 @@ requirement, decisions (the user's answers, verbatim), in-scope items, **out of 
 **protected existing logic**, files per work unit, and acceptance checks. Show the user
 a short summary and get a go-ahead (unless `require_brief_approval` is false). This is the one checkpoint where the user can catch
 a misunderstanding for the price of a sentence rather than a rewrite. Once approved,
-run `scope_check.py --snapshot` so edits that existed before the pipeline are not
-blamed on it.
+fill the brief's Baseline section (see "Keeping tool output small") so edits that
+existed before the pipeline are not blamed on it.
 
 ### Phase 5 — Implement (Sonnet)
 Split the brief into work units that touch disjoint files. Launch one
 `mqbit-dev-pipeline:implementor` per unit — in parallel when files do not overlap, otherwise
 in sequence. Each prompt contains: the brief path, the unit's number and file list, the
-build/test command, the comment limit (`comments.max_lines`, default 1 line), and the
-full path of `scripts/run_checks.py` so the implementor runs tests through it instead of
-dumping raw logs. The implementor edits only listed files and returns a status:
+build/test command, and the comment limit (`comments.max_lines`, default 1 line). The
+implementor edits only listed files and returns a status:
 - `DONE` → continue.
 - `QUESTION` / `BLOCKED` → bring the question to the user (Phase 3 method), record the
   answer in the brief's Decisions, and re-run that unit.
 
-### Phase 6 — Audit (script first, Haiku as fallback)
-Run `scope_check.py`. It reports files outside scope, removed/replaced lines, renames,
-formatting-only edits, uncovered brief items and new declarations. Only if it exits 2
-(no git / no Python) launch `mqbit-dev-pipeline:diff-auditor` to do the same by reading.
-The script cannot judge intent: a removal inside an authorised file is listed for you
-to confirm, and each new declaration must be matched to a brief item by you.
+### Phase 6 — Audit (Haiku)
+Launch `mqbit-dev-pipeline:diff-auditor` with the brief path and any `protected_paths`,
+`scope.*` and `comments.max_lines` values from `dev-pipeline.json`. It compares the change with
+the brief's Baseline and reports files outside scope, removed/replaced lines, renames,
+formatting-only edits, over-long comments, touched protected paths, uncovered brief
+items and new declarations. Without git, pass it the implementor's list of changed
+files. The auditor does not judge intent: a removal inside an authorised file is listed
+for you to confirm, and each new declaration must be matched to a brief item by you.
 
 ### Phase 7 — Verify and close (Opus)
 - Judge each auditor finding. Unrequested additions and unauthorised removals go back to
   the implementor to be reverted. Allow at most `max_fix_rounds` fix rounds (default 2), then report the
   remaining issue to the user instead of looping.
-- Run the project's build/tests yourself with `run_checks.py` (or have the
-  implementor's output on hand) and report real results. Never say "done" over a failing or unrun check.
+- Run the project's build/tests yourself as described in "Keeping tool output small"
+  (or have the implementor's output on hand) and report real results. Never say "done" over a failing or unrun check.
 - Final message to the user, in this shape:
   1. What was built (mapped to brief items)
   2. Files changed
@@ -161,7 +167,7 @@ to confirm, and each new declaration must be matched to a brief item by you.
   6. Anything still open
   7. **Pipeline receipt** — one compact line per phase run or skipped, e.g.
      `Scout ✓ haiku · Clarify ✓ (0 questions) · Brief ✓ · Implement ✓ sonnet ·
-     Audit ✓ scope_check clean · Tests ✓ run_checks · Memory ✓ +2 entries`. A skipped
+     Audit ✓ diff-auditor clean · Tests ✓ 42 passed · Memory ✓ +2 entries`. A skipped
      step shows the reason (`Scout – single named file`). This is how the user sees the
      pipeline did its job.
 
@@ -171,18 +177,21 @@ phase entirely if the work was blocked, rejected, or left failing, or if
 `context.update_memory` is false — never memorize unverified work. Details and the entry
 rules: `references/project-memory.md`.
 
-1. **List what changed:** `scope_check.py --files`.
-2. **Update memory** with `memory.py` (create it with `init` if missing). Every changed
-   file should end up covered by a Map entry — add a one-line entry for any that is not,
-   even after a small change. That is how the memory gets seeded:
-   - `add --section map --path <p> --text "<what it is for>"` for each new area, or one
-     whose purpose changed. One line each; purpose, not narrative.
-   - `add --section decisions|conventions|gotchas` only for durable rules the user
-     confirmed or you verified in code — things that would save a future question or
-     mistake. Not one-off details of this requirement.
-   - `refresh --paths <changed files>` to restamp the entries these changes touched.
-   - `prune` to drop entries whose path no longer exists.
-   - If `status` reports OVER CAP, compress the file (merge or drop low-value lines).
+1. **List what changed:** `git status --porcelain` compared with the Baseline (or the
+   implementor's file list without git).
+2. **Update the memory file** by editing it directly (create it from the format in
+   `references/project-memory.md` if missing). Every changed file should end up covered
+   by a Map entry — add a one-line entry for any that is not, even after a small change.
+   That is how the memory gets seeded:
+   - A Map line for each new area, or one whose purpose changed. One line each; purpose,
+     not narrative. Replace an existing line for the same path instead of adding another.
+   - Decisions, Conventions or Gotchas lines only for durable rules the user confirmed or
+     you verified in code — things that would save a future question or mistake. Not
+     one-off details of this requirement.
+   - Restamp the Map entries these changes touched (stamp format in the reference).
+   - Drop entries whose path no longer exists.
+   - If the file is over `context.max_memory_lines`, compress it (merge or drop
+     low-value lines).
 3. **Refresh the code index, if configured.** `context.refresh_command`: run it in the
    background (`run_in_background`) and do not wait. `context.refresh_tool`: call exactly the
    tool the user named there and no other (load its schema first if it is deferred).
@@ -203,5 +212,4 @@ Never store secrets, credentials, personal data, code, or guesses in memory.
   brief, and list the assumptions in the final message so nothing is hidden.
 - *Trivial change (a typo, one constant):* keep the pipeline small, not absent — read
   the one named file directly instead of launching a scout, keep the brief to a few
-  lines, and still run snapshot → implementor → `scope_check.py` → `run_checks.py` →
-  memory update. Skip clarifying questions only if there truly are none.
+  lines, and still run baseline → implementor → diff audit → tests → memory update. Skip clarifying questions only if there truly are none.

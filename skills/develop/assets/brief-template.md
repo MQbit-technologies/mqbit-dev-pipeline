@@ -32,6 +32,10 @@
 |------|----------------------------------|------------------|
 | U1 | | 1 |
 
+## Baseline (filled after approval, before implementing)
+- Commit: `<git rev-parse HEAD, or "no git">`
+- Already modified before the pipeline: <files from git status --porcelain, or "none">
+
 ## Conventions to match
 - <naming / layering / error handling / test style, with an example path>
 
